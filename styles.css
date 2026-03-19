@@ -1,0 +1,422 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #f5f0eb 0%, #e8e2dc 100%);
+  min-height: 100vh;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 2rem;
+}
+
+.tense-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.tense-section:last-child {
+  margin-bottom: 0;
+}
+
+h1 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2c2c2c;
+  border-bottom: 2px solid #c9a86c;
+  padding-bottom: 0.5rem;
+}
+
+.intro {
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+}
+
+.usage-list {
+  margin: 0 0 1rem 1.25rem;
+  padding: 0;
+  list-style: none;
+}
+
+.usage-list li {
+  margin-bottom: 1rem;
+  padding-left: 0.5rem;
+}
+
+.usage-list li::before {
+  content: "●";
+  color: #c9a86c;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  margin-left: -1rem;
+}
+
+.example {
+  display: inline-block;
+  margin-top: 0.25rem;
+  color: #5a4a3a;
+}
+
+.tense-note {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  background: #f8f5f0;
+  border-radius: 8px;
+  border-left: 4px solid #b8a078;
+  font-size: 0.95rem;
+  color: #3a3429;
+}
+
+.tense-note a {
+  color: #7a5c20;
+  font-weight: 600;
+}
+
+.tense-note a:hover {
+  text-decoration: underline;
+}
+
+.markers {
+  margin: 1rem 0 1.5rem;
+  padding: 0.75rem 1rem;
+  background: #f8f5f0;
+  border-radius: 8px;
+  border-left: 4px solid #c9a86c;
+  font-size: 0.95rem;
+}
+
+.tense-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.table-quiz-full {
+  vertical-align: top;
+  background: #faf8f5;
+}
+
+.table-quiz-row .table-mini-quiz {
+  margin-bottom: 0;
+}
+
+.table-mini-quiz .translation {
+  margin-bottom: 0.55rem;
+}
+
+@media (min-width: 560px) {
+  .table-quiz-row .quiz-options {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.65rem 1.25rem;
+  }
+}
+
+.tense-table th,
+.tense-table td {
+  border: 1px solid #e0d9d0;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.tense-table thead th {
+  background: #2c2c2c;
+  color: #fff;
+  font-weight: 600;
+}
+
+.tense-table tbody tr:nth-child(even) {
+  background: #faf8f5;
+}
+
+.tense-table tbody tr:hover {
+  background: #f5f0eb;
+}
+
+.tense-table td {
+  vertical-align: top;
+}
+
+.usage-cell {
+  background: #f8f5f0;
+  font-size: 0.9em;
+  color: #4a4035;
+  max-width: 220px;
+}
+
+.tense-table tr.exception .usage-cell {
+  background: #e3f2fd;
+}
+
+/* Глагол to be (am/is/are, was/were) — ярко-синее выделение */
+.be-form {
+  color: #0066ff;
+  font-weight: 800;
+}
+
+/* Вспомогательные do, does, did; окончания -s/-es (Present) и -ed (Past) */
+.aux,
+.verb-s,
+.verb-ed {
+  background: linear-gradient(180deg, #ffeb3b 0%, #ffc107 100%);
+  color: #1a1a1a;
+  font-weight: 800;
+  padding: 0.15em 0.35em;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px #f57f17;
+}
+
+/* Зазор перед выделенным окончанием, чтобы основа не «прилипала» к жёлтому блоку */
+.verb-s,
+.verb-ed {
+  margin-left: 0.2em;
+}
+
+/* Смысловой глагол после Does — метка + HTML-тултип при hover / focus */
+.verb-q-base {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  font-weight: 700;
+  padding: 0.12em 0.35em;
+  border-radius: 4px;
+  border-bottom: 2px dashed #c17800;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 241, 180, 0.95) 0%,
+    rgba(255, 224, 130, 0.75) 100%
+  );
+  box-shadow: inset 0 -2px 0 rgba(193, 120, 0, 0.25);
+  outline: none;
+}
+
+.verb-q-base:focus-visible {
+  box-shadow:
+    inset 0 -2px 0 rgba(193, 120, 0, 0.25),
+    0 0 0 2px #fff,
+    0 0 0 4px #c17800;
+}
+
+.verb-q-base__tip {
+  position: absolute;
+  z-index: 100;
+  left: 50%;
+  bottom: calc(100% + 0.45rem);
+  transform: translateX(-50%);
+  min-width: 11rem;
+  max-width: min(20rem, 85vw);
+  padding: 0.55rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  color: #2a241c;
+  background: #fffbeb;
+  border: 2px solid #c17800;
+  border-radius: 8px;
+  box-shadow: 0 6px 20px rgba(42, 36, 28, 0.18);
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    visibility 0.15s ease;
+}
+
+.verb-q-base__tip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -7px;
+  border: 7px solid transparent;
+  border-top-color: #c17800;
+}
+
+.verb-q-base:hover .verb-q-base__tip,
+.verb-q-base:focus .verb-q-base__tip,
+.verb-q-base:focus-within .verb-q-base__tip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Ячейки таблицы не обрезают всплывающую подсказку */
+.tense-table td:has(.verb-q-base) {
+  overflow: visible;
+}
+
+/* Строки-исключения (глагол to be) */
+.tense-table tr.exception {
+  background: #e3f2fd !important;
+}
+
+.tense-table tr.exception:hover {
+  background: #bbdefb !important;
+}
+
+.exception-label {
+  font-weight: 700;
+  color: #0d47a1;
+  text-align: center;
+  padding: 0.5rem 1rem !important;
+  background: #bbdefb !important;
+}
+
+.translation {
+  display: block;
+  margin-top: 0.35em;
+  font-size: 0.85em;
+  color: #5a4a3a;
+}
+
+.subject-select {
+  font: inherit;
+  font-weight: 600;
+  color: #1a1a1a;
+  background: #fff;
+  border: 2px solid #c9a86c;
+  border-radius: 6px;
+  padding: 0.2em 0.4em;
+  margin-right: 0.25em;
+  vertical-align: baseline;
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.subject-select:hover,
+.subject-select:focus {
+  border-color: #a08450;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(201, 168, 108, 0.35);
+}
+
+/* Сворачиваемые тесты под таблицами */
+.quiz-collapse {
+  margin-top: 1.5rem;
+  border: 1px solid #e0d9d0;
+  border-radius: 10px;
+  background: #fdfcfa;
+  overflow: hidden;
+}
+
+.quiz-summary {
+  padding: 0.85rem 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  background: #f0ebe4;
+  color: #3d3328;
+  border-bottom: 1px solid #e0d9d0;
+}
+
+.quiz-summary::-webkit-details-marker {
+  display: none;
+}
+
+.quiz-summary::before {
+  content: "▸ ";
+  color: #c9a86c;
+  font-weight: 700;
+}
+
+.quiz-collapse[open] .quiz-summary::before {
+  content: "▾ ";
+}
+
+.quiz-block {
+  padding: 1rem 1.1rem 1.25rem;
+}
+
+.quiz-question {
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e8e0d6;
+  background: #fff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.quiz-question:last-child {
+  margin-bottom: 0;
+}
+
+.quiz-stem {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.quiz-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.quiz-option input {
+  accent-color: #c9a86c;
+}
+
+.quiz-feedback {
+  margin: 0.5rem 0 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.quiz-question.quiz-ok {
+  border-color: #81c784;
+  box-shadow: 0 0 0 1px rgba(129, 199, 132, 0.35);
+}
+
+.quiz-question.quiz-ok .quiz-feedback {
+  color: #2e7d32;
+}
+
+.quiz-question.quiz-bad {
+  border-color: #e57373;
+  box-shadow: 0 0 0 1px rgba(229, 115, 115, 0.35);
+}
+
+.quiz-question.quiz-bad .quiz-feedback {
+  color: #c62828;
+}
+
+@media (max-width: 640px) {
+  .content {
+    padding: 1rem;
+  }
+
+  .tense-section {
+    padding: 1.25rem;
+  }
+
+  .tense-table {
+    font-size: 0.85rem;
+  }
+
+  .tense-table th,
+  .tense-table td {
+    padding: 0.5rem 0.6rem;
+  }
+}
