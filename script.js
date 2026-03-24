@@ -452,11 +452,10 @@ function updatePastWalkedRow(tr) {
 function updatePastViewedRow(tr) {
   const p = "he";
   const subj = subjectDisplay(p);
-  const pos = possessiveForProfile(p);
   const auxPastQ = pastAuxQuestion();
-  tr.querySelector("[data-col='aff']").innerHTML = `He ${pastAffirmEdSuffix("view", "viewed")} ${pos} profile on LinkedIn.<br><span class="translation">${getRu(p, "viewed")}</span>`;
-  tr.querySelector("[data-col='q']").innerHTML = `<span class="aux">${auxPastQ}</span> ${subj} ${pastQuestionMainVerbHtml("view", auxPastQ)} ${pos} profile on LinkedIn?<br><span class="translation">${getRu(p, "viewedQ")}</span>`;
-  tr.querySelector("[data-col='neg']").innerHTML = `He <span class="aux">${pastAuxNegative()}</span> not view ${pos} profile on LinkedIn.<br><span class="translation">${getRu(p, "viewedN")}</span>`;
+  tr.querySelector("[data-col='aff']").innerHTML = `He ${pastAffirmEdSuffix("view", "viewed")} my profile on LinkedIn.<br><span class="translation">${getRu(p, "viewed")}</span>`;
+  tr.querySelector("[data-col='q']").innerHTML = `<span class="aux">${auxPastQ}</span> ${subj} ${pastQuestionMainVerbHtml("view", auxPastQ)} my profile on LinkedIn?<br><span class="translation">${getRu(p, "viewedQ")}</span>`;
+  tr.querySelector("[data-col='neg']").innerHTML = `He <span class="aux">${pastAuxNegative()}</span> not view my profile on LinkedIn.<br><span class="translation">${getRu(p, "viewedN")}</span>`;
 }
 
 function updatePastBeRow(tr, p) {
@@ -534,6 +533,9 @@ const QUIZ_BAD = "Пока неверно — загляните в таблиц
 /** Сколько вопросов показывать из пула при каждой загрузке страницы */
 const QUIZ_RANDOM_COUNT = 8;
 
+/** Сколько вопросов добавлять по кнопке «Ещё!» */
+const QUIZ_MORE_COUNT = 4;
+
 /**
  * @typedef {{ stem: string, translation: string, correct: "a" | "b" | "c", labels: Record<"a" | "b" | "c", string> }} QuizPoolItem
  */
@@ -592,58 +594,101 @@ const QUIZ_POOL_PRESENT = /** @type {QuizPoolItem[]} */ ([
   { stem: "The film ___ at 9 p.m. at the cinema.", translation: "Фильм начинается в 21:00 в кино.", correct: "c", labels: { a: "start", b: "starting", c: "starts" } },
 ]);
 
-/** Past Simple: 50 вопросов. */
+/** Past Simple (без неправильных глаголов, кроме was/were и wasn't/weren't). */
 const QUIZ_POOL_PAST = /** @type {QuizPoolItem[]} */ ([
-  { stem: "Yesterday my sister ___ a new phone.", translation: "Вчера сестра купила новый телефон.", correct: "c", labels: { a: "buy", b: "buys", c: "bought" } },
   { stem: "Last year we ___ in Paris.", translation: "В прошлом году мы были в Париже.", correct: "b", labels: { a: "was", b: "were", c: "are" } },
-  { stem: "He ___ his keys in the taxi.", translation: "Он оставил ключи в такси.", correct: "a", labels: { a: "left", b: "leave", c: "leaves" } },
   { stem: "___ your father call you last night?", translation: "Позвонил ли тебе отец вчера вечером?", correct: "c", labels: { a: "Was", b: "Does", c: "Did" } },
-  { stem: "She ___ (-) come to the cafe.", translation: "Она не пришла в кафе.", correct: "b", labels: { a: "don't", b: "didn't", c: "doesn't" } },
+  { stem: "She ___ (-) come to the cafe.", translation: "Она не пришла в кафе.", correct: "b", labels: { a: "wasn't", b: "didn't", c: "doesn't" } },
   { stem: "In 2020 my cousin ___ a student.", translation: "В 2020 году мой двоюродный брат / сестра был / была студентом / студенткой.", correct: "a", labels: { a: "was", b: "were", c: "is" } },
-  { stem: "We ___ to the station by bus.", translation: "Мы поехали на вокзал на автобусе.", correct: "c", labels: { a: "go", b: "goes", c: "went" } },
   { stem: "I ___ my wallet on the table.", translation: "Я положил(а) кошелёк на стол.", correct: "b", labels: { a: "place", b: "placed", c: "places" } },
   { stem: "They ___ pizza at a restaurant.", translation: "Они заказали пиццу в ресторане.", correct: "a", labels: { a: "ordered", b: "order", c: "orders" } },
   { stem: "Last night the children ___ very tired.", translation: "Вчера вечером дети очень устали.", correct: "c", labels: { a: "was", b: "is", c: "were" } },
   { stem: "___ you have your ticket yesterday?", translation: "У тебя вчера был билет?", correct: "a", labels: { a: "Did", b: "Do", c: "Were" } },
-  { stem: "My parents ___ from Italy in 1999.", translation: "Мои родители из Италии (переехали) в 1999.", correct: "b", labels: { a: "was", b: "were", c: "are" } },
-  { stem: "He ___ (-) buy the computer.", translation: "Он не купил компьютер.", correct: "c", labels: { a: "don't", b: "doesn't", c: "didn't" } },
-  { stem: "Yesterday I ___ my brother at the station.", translation: "Вчера я встретил(а) брата на вокзале.", correct: "a", labels: { a: "met", b: "meet", c: "meets" } },
-  { stem: "She ___ a taxi to the hotel.", translation: "Она взяла такси до отеля.", correct: "b", labels: { a: "take", b: "took", c: "takes" } },
+  { stem: "He ___ (-) buy the computer.", translation: "Он не купил компьютер.", correct: "c", labels: { a: "don't", b: "wasn't", c: "didn't" } },
   { stem: "Last summer he ___ a tourist in Spain.", translation: "Прошлым летом он был туристом в Испании.", correct: "a", labels: { a: "was", b: "were", c: "is" } },
-  { stem: "We ___ photos in the park.", translation: "Мы сделали фото в парке.", correct: "c", labels: { a: "take", b: "takes", c: "took" } },
-  { stem: "He ___ his bag in the cafe.", translation: "Он забыл сумку в кафе.", correct: "a", labels: { a: "forgot", b: "forget", c: "forgets" } },
-  { stem: "My aunt ___ us a story.", translation: "Тётя рассказала нам историю.", correct: "b", labels: { a: "tell", b: "told", c: "tells" } },
-  { stem: "They ___ (-) visit the museum.", translation: "Они не посетили музей.", correct: "a", labels: { a: "didn't", b: "don't", c: "doesn't" } },
+  { stem: "They ___ (-) visit the museum.", translation: "Они не посетили музей.", correct: "a", labels: { a: "didn't", b: "don't", c: "weren't" } },
   { stem: "In 2018 I ___ a nurse.", translation: "В 2018 году я была медсестрой / я был медбратом.", correct: "b", labels: { a: "were", b: "was", c: "am" } },
   { stem: "My grandfather ___ a driver.", translation: "Дедушка был водителем.", correct: "c", labels: { a: "were", b: "are", c: "was" } },
   { stem: "___ she live in London last year?", translation: "Она жила в Лондоне в прошлом году?", correct: "b", labels: { a: "Does", b: "Did", c: "Was" } },
   { stem: "The train ___ late yesterday.", translation: "Вчера поезд опоздал.", correct: "a", labels: { a: "was", b: "were", c: "is" } },
   { stem: "I ___ (-) see your pen.", translation: "Я не видел(а) твою ручку.", correct: "c", labels: { a: "don't", b: "doesn't", c: "didn't" } },
-  { stem: "She ___ water for her family.", translation: "Она купила воду для семьи.", correct: "a", labels: { a: "bought", b: "buy", c: "buys" } },
   { stem: "We ___ (-) go to the bank.", translation: "Мы не пошли в банк.", correct: "b", labels: { a: "don't", b: "didn't", c: "doesn't" } },
-  { stem: "My uncle ___ us to his office.", translation: "Дядя отвёз нас в свой офис.", correct: "c", labels: { a: "take", b: "takes", c: "took" } },
   { stem: "Yesterday you ___ at home.", translation: "Вчера ты был(а) / вы были дома.", correct: "b", labels: { a: "was", b: "were", c: "are" } },
-  { stem: "My daughter ___ her homework last night.", translation: "Дочь сделала домашнее задание вчера вечером.", correct: "a", labels: { a: "did", b: "do", c: "does" } },
-  { stem: "He ___ a letter to his mother.", translation: "Он написал письмо маме.", correct: "c", labels: { a: "write", b: "writes", c: "wrote" } },
   { stem: "___ they work in Berlin in 2015?", translation: "Они работали в Берлине в 2015?", correct: "a", labels: { a: "Did", b: "Do", c: "Were" } },
-  { stem: "I ___ my English book on the bus.", translation: "Я потерял(а) учебник английского в автобусе.", correct: "b", labels: { a: "lose", b: "lost", c: "loses" } },
-  { stem: "She ___ (-) answer my call.", translation: "Она не ответила на мой звонок.", correct: "b", labels: { a: "don't", b: "didn't", c: "doesn't" } },
+  { stem: "She ___ (-) answer my call.", translation: "Она не ответила на мой звонок.", correct: "b", labels: { a: "don't", b: "didn't", c: "wasn't" } },
   { stem: "Ten years ago my parents ___ teachers.", translation: "Десять лет назад родители были учителями.", correct: "c", labels: { a: "was", b: "is", c: "were" } },
-  { stem: "Last week my cousin ___ from Canada.", translation: "На прошлой неделе двоюродный брат / сестра приехал(а) из Канады.", correct: "a", labels: { a: "came", b: "come", c: "comes" } },
-  { stem: "He ___ me about his family.", translation: "Он рассказал мне о своей семье.", correct: "c", labels: { a: "tell", b: "tells", c: "told" } },
   { stem: "I ___ (-) know his name.", translation: "Я не знал(а) его имя.", correct: "a", labels: { a: "didn't", b: "don't", c: "doesn't" } },
   { stem: "My sister ___ a nurse in 2010.", translation: "В 2010 сестра была медсестрой.", correct: "b", labels: { a: "were", b: "was", c: "are" } },
   { stem: "___ he feel tired yesterday?", translation: "Вчера он чувствовал усталость?", correct: "c", labels: { a: "Was", b: "Does", c: "Did" } },
-  { stem: "We ___ the wrong bus.", translation: "Мы сели не на тот автобус.", correct: "a", labels: { a: "took", b: "take", c: "takes" } },
-  { stem: "She ___ her phone in her bag.", translation: "Она положила телефон в сумку.", correct: "b", labels: { a: "putted", b: "put", c: "puts" } },
   { stem: "Yesterday the traffic ___ terrible.", translation: "Вчера на дороге было ужасно (пробки).", correct: "a", labels: { a: "was", b: "were", c: "is" } },
-  { stem: "My boyfriend ___ me a photo.", translation: "Парень прислал мне фото.", correct: "c", labels: { a: "send", b: "sends", c: "sent" } },
-  { stem: "I ___ up early last Monday.", translation: "В прошлый понедельник я рано встал(а).", correct: "b", labels: { a: "get", b: "got", c: "gets" } },
   { stem: "They ___ (-) find their keys.", translation: "Они не нашли свои ключи.", correct: "a", labels: { a: "didn't", b: "don't", c: "doesn't" } },
   { stem: "Last year I ___ a student.", translation: "В прошлом году я был(а) студентом / студенткой.", correct: "b", labels: { a: "were", b: "was", c: "am" } },
-  { stem: "My grandmother ___ us at the airport.", translation: "Бабушка встретила нас в аэропорту.", correct: "c", labels: { a: "meet", b: "meets", c: "met" } },
-  { stem: "He ___ his charger in the office.", translation: "Он оставил зарядку в офисе.", correct: "a", labels: { a: "left", b: "leave", c: "leaves" } },
   { stem: "___ your parents live in Rome two years ago?", translation: "Жили ли родители в Риме два года назад?", correct: "b", labels: { a: "Do", b: "Did", c: "Were" } },
+  { stem: "Yesterday I ___ five kilometres in the park.", translation: "Вчера я прошёл / прошла пять километров в парке.", correct: "c", labels: { a: "walk", b: "walks", c: "walked" } },
+  { stem: "She ___ dinner for her family last night.", translation: "Вчера вечером она приготовила ужин для семьи.", correct: "a", labels: { a: "cooked", b: "cook", c: "cooks" } },
+  { stem: "Last month my aunt ___ in a small cafe.", translation: "В прошлом месяце тётя работала в маленьком кафе.", correct: "b", labels: { a: "work", b: "worked", c: "works" } },
+  { stem: "My grandmother ___ a warm scarf last winter.", translation: "Прошлой зимой бабушка сшила тёплый шарф.", correct: "c", labels: { a: "sew", b: "sews", c: "sewed" } },
+  { stem: "On Saturday they ___ in the hills.", translation: "В субботу они ходили в поход в холмах.", correct: "a", labels: { a: "hiked", b: "hike", c: "hikes" } },
+  { stem: "She ___ a small star on her bag.", translation: "Она вышила маленькую звёздочку на сумке.", correct: "b", labels: { a: "embroider", b: "embroidered", c: "embroiders" } },
+  { stem: "___ you watch the cartoon yesterday?", translation: "Ты вчера смотрел мультфильм?", correct: "c", labels: { a: "Was", b: "Do", c: "Did" } },
+  { stem: "We ___ the kitchen on Sunday morning.", translation: "В воскресенье утром мы убрали кухню.", correct: "a", labels: { a: "cleaned", b: "clean", c: "cleans" } },
+  { stem: "He ___ English for an hour after school.", translation: "После школы он занимался английским час.", correct: "c", labels: { a: "study", b: "studies", c: "studied" } },
+  { stem: "They ___ a simple song in class.", translation: "На уроке они выучили простую песню.", correct: "b", labels: { a: "learn", b: "learned", c: "learns" } },
+  { stem: "I ___ my homework before dinner.", translation: "Я закончил(а) домашнее задание до ужина.", correct: "a", labels: { a: "finished", b: "finish", c: "finishes" } },
+  { stem: "The shop ___ at 8 a.m. yesterday.", translation: "Вчера магазин открылся в 8 утра.", correct: "b", labels: { a: "open", b: "opened", c: "opens" } },
+  { stem: "She ___ her room green last year.", translation: "В прошлом году она покрасила комнату в зелёный.", correct: "c", labels: { a: "paint", b: "paints", c: "painted" } },
+  { stem: "My brother ___ football with his friends.", translation: "Брат поиграл в футбол с друзьями.", correct: "a", labels: { a: "played", b: "play", c: "plays" } },
+  { stem: "We ___ a short film at home.", translation: "Мы посмотрели дома короткий фильм.", correct: "c", labels: { a: "watch", b: "watches", c: "watched" } },
+  { stem: "I ___ fifteen minutes for the bus.", translation: "Я ждал(а) автобус пятнадцать минут.", correct: "b", labels: { a: "wait", b: "waited", c: "waits" } },
+  { stem: "They ___ the sentences from the board.", translation: "Они переписали предложения с доски.", correct: "a", labels: { a: "copied", b: "copy", c: "copies" } },
+  { stem: "My cousin ___ to the coast by train.", translation: "Двоюродный брат / сестра ездил(а) на побережье на поезде.", correct: "c", labels: { a: "travel", b: "travels", c: "traveled" } },
+  { stem: "It ___ all afternoon last Saturday.", translation: "В прошлую субботу дождь шёл весь день.", correct: "b", labels: { a: "rain", b: "rained", c: "rains" } },
+  { stem: "I ___ my hands before lunch.", translation: "Я вымыл(а) руки перед обедом.", correct: "a", labels: { a: "washed", b: "wash", c: "washes" } },
+  { stem: "We ___ a table for four people.", translation: "Мы забронировали столик на четверых.", correct: "c", labels: { a: "book", b: "books", c: "booked" } },
+  { stem: "He ___ the door and went to bed.", translation: "Он закрыл дверь и пошёл спать.", correct: "b", labels: { a: "close", b: "closed", c: "closes" } },
+  { stem: "She ___ the chairs into the garden.", translation: "Она вынесла стулья в сад.", correct: "a", labels: { a: "carried", b: "carry", c: "carries" } },
+  { stem: "___ your sister help you yesterday?", translation: "Сестра вчера тебе помогла?", correct: "c", labels: { a: "Does", b: "Was", c: "Did" } },
+  { stem: "I ___ (-) finish the letter.", translation: "Я не закончил(а) письмо.", correct: "b", labels: { a: "don't", b: "didn't", c: "doesn't" } },
+  { stem: "They ___ at school after the lesson.", translation: "После урока они остались в школе.", correct: "c", labels: { a: "stay", b: "stays", c: "stayed" } },
+  { stem: "My uncle ___ the fence white.", translation: "Дядя покрасил забор в белый.", correct: "a", labels: { a: "painted", b: "paint", c: "paints" } },
+  { stem: "She ___ her aunt in Warsaw.", translation: "Она навестила тётю в Варшаве.", correct: "b", labels: { a: "visit", b: "visited", c: "visits" } },
+  { stem: "The dog ___ over the low wall.", translation: "Собака перепрыгнула через низкую стенку.", correct: "c", labels: { a: "jump", b: "jumps", c: "jumped" } },
+  { stem: "I ___ (-) want juice.", translation: "Я не хотел(а) сок.", correct: "a", labels: { a: "didn't", b: "don't", c: "doesn't" } },
+  { stem: "___ it snow here yesterday?", translation: "Вчера здесь шёл снег?", correct: "b", labels: { a: "Was", b: "Did", c: "Does" } },
+  { stem: "We ___ for the English test.", translation: "Мы готовились к тесту по английскому.", correct: "a", labels: { a: "studied", b: "study", c: "studies" } },
+  { stem: "They ___ pasta and salad.", translation: "Они приготовили пасту и салат.", correct: "c", labels: { a: "cook", b: "cooks", c: "cooked" } },
+  { stem: "I ___ the floor in my room.", translation: "Я вымыл(а) пол в своей комнате.", correct: "b", labels: { a: "clean", b: "cleaned", c: "cleans" } },
+  { stem: "My sister ___ a dress for the party.", translation: "Сестра сшила платье для вечеринки.", correct: "a", labels: { a: "sewed", b: "sew", c: "sews" } },
+  { stem: "I ___ to a podcast on the bus.", translation: "В автобусе я слушал(а) подкаст.", correct: "c", labels: { a: "listen", b: "listens", c: "listened" } },
+  { stem: "She ___ a cat in her notebook.", translation: "Она нарисовала кошку в тетради (красками).", correct: "b", labels: { a: "paint", b: "painted", c: "paints" } },
+  { stem: "___ you enjoy the picnic?", translation: "Тебе понравился пикник?", correct: "a", labels: { a: "Did", b: "Do", c: "Were" } },
+  { stem: "He ___ the guitar for twenty minutes.", translation: "Он двадцать минут играл на гитаре (упражнялся).", correct: "c", labels: { a: "practice", b: "practices", c: "practiced" } },
+  { stem: "We ___ (-) ask the guide.", translation: "Мы не спросили экскурсовода.", correct: "c", labels: { a: "don't", b: "doesn't", c: "didn't" } },
+  { stem: "The lesson ___ at nine o'clock.", translation: "Урок начался в девять.", correct: "a", labels: { a: "started", b: "start", c: "starts" } },
+  { stem: "I ___ home before the rain.", translation: "Я пришёл(пришла) домой до дождя.", correct: "b", labels: { a: "arrive", b: "arrived", c: "arrives" } },
+  { stem: "They ___ train tickets online.", translation: "Они купили билеты на поезд онлайн (забронировали).", correct: "a", labels: { a: "booked", b: "book", c: "books" } },
+  { stem: "She ___ bread for breakfast.", translation: "Она поджарила хлеб на завтрак.", correct: "c", labels: { a: "toast", b: "toasts", c: "toasted" } },
+  { stem: "My father ___ until eight yesterday.", translation: "Вчера отец работал до восьми.", correct: "b", labels: { a: "work", b: "worked", c: "works" } },
+  { stem: "___ she clean her room on Saturday?", translation: "Она убрала комнату в субботу?", correct: "c", labels: { a: "Is", b: "Does", c: "Did" } },
+  { stem: "We ___ to the lake with our cousins.", translation: "Мы дошли до озера с двоюродными братьями / сёстрами.", correct: "a", labels: { a: "walked", b: "walk", c: "walks" } },
+  { stem: "The children ___ in the garden.", translation: "Дети поиграли в саду.", correct: "c", labels: { a: "play", b: "plays", c: "played" } },
+  { stem: "I ___ (-) wash the car.", translation: "Я не помыл(а) машину.", correct: "b", labels: { a: "don't", b: "didn't", c: "doesn't" } },
+  { stem: "He ___ his tent by the lake.", translation: "Он поставил палатку у озера.", correct: "a", labels: { a: "pitched", b: "pitch", c: "pitches" } },
+  { stem: "She ___ warm boots for the trip.", translation: "Ей понадобились тёплые ботинки в поездку.", correct: "c", labels: { a: "need", b: "needs", c: "needed" } },
+  { stem: "They ___ to the neighbours.", translation: "Они помахали соседям.", correct: "b", labels: { a: "wave", b: "waved", c: "waves" } },
+  { stem: "I ___ a long email to my teacher.", translation: "Я написал(а) длинное письмо учителю (на клавиатуре).", correct: "a", labels: { a: "typed", b: "type", c: "types" } },
+  { stem: "We ___ the science museum in April.", translation: "В апреле мы посетили музей науки.", correct: "c", labels: { a: "visit", b: "visits", c: "visited" } },
+  { stem: "He ___ (-) enjoy the long walk.", translation: "Ему не понравилась долгая прогулка.", correct: "a", labels: { a: "didn't", b: "don't", c: "doesn't" } },
+  { stem: "She ___ her friends about the film.", translation: "Она написала друзьям про фильм (в мессенджере).", correct: "b", labels: { a: "text", b: "texted", c: "texts" } },
+  { stem: "They ___ at the wrong bus stop.", translation: "Они ждали на неправильной остановке.", correct: "c", labels: { a: "wait", b: "waits", c: "waited" } },
+  { stem: "My mother ___ chicken soup for us.", translation: "Мама сварила нам куриный суп.", correct: "a", labels: { a: "cooked", b: "cook", c: "cooks" } },
+  { stem: "We ___ the new words in our notebooks.", translation: "Мы переписали новые слова в тетрадях.", correct: "b", labels: { a: "copy", b: "copied", c: "copies" } },
+  { stem: "Last Sunday he ___ in the forest for three hours.", translation: "В прошлое воскресенье он три часа гулял / ходил в лесу.", correct: "c", labels: { a: "hike", b: "hikes", c: "hiked" } },
+  { stem: "___ you work in a shop last summer?", translation: "Ты работал в магазине прошлым летом?", correct: "a", labels: { a: "Did", b: "Do", c: "Were" } },
+  { stem: "The baby ___ all night.", translation: "Малыш всю ночь плакал.", correct: "b", labels: { a: "cry", b: "cried", c: "cries" } },
+  { stem: "I ___ (-) listen to the teacher.", translation: "Я не слушал(а) учителя.", correct: "c", labels: { a: "don't", b: "doesn't", c: "didn't" } },
+  { stem: "She ___ a picture of her cat online.", translation: "Она выложила фото своей кошки в интернет.", correct: "a", labels: { a: "posted", b: "post", c: "posts" } },
+  { stem: "We ___ the windows because it was cold.", translation: "Мы закрыли окна, потому что было холодно.", correct: "c", labels: { a: "close", b: "closes", c: "closed" } },
 ]);
 
 const QUIZ_POOLS = {
@@ -660,12 +705,28 @@ function shuffleArray(items) {
   return arr;
 }
 
-function pickRandomQuizItems(pool, count) {
-  if (pool.length <= count) {
-    return shuffleArray(pool);
-  }
-  return shuffleArray(pool).slice(0, count);
+/**
+ * @param {QuizPoolItem[]} pool
+ * @param {Set<number>} usedIndices
+ * @param {number} count
+ * @returns {QuizPoolItem[]}
+ */
+function pickUnusedQuizItems(pool, usedIndices, count) {
+  const available = pool
+    .map((_, i) => i)
+    .filter((i) => !usedIndices.has(i));
+  const shuffled = shuffleArray(available);
+  const take = shuffled.slice(0, Math.min(count, shuffled.length));
+  take.forEach((i) => usedIndices.add(i));
+  return take.map((i) => pool[i]);
 }
+
+/**
+ * @typedef {{ pool: QuizPoolItem[], used: Set<number>, namePrefix: string, nextIndex: number }} QuizBlockState
+ */
+
+/** @type {WeakMap<HTMLElement, QuizBlockState>} */
+const quizBlockState = new WeakMap();
 
 function escapeHtml(text) {
   return text
@@ -676,30 +737,31 @@ function escapeHtml(text) {
 }
 
 /**
- * @param {HTMLElement} container
  * @param {QuizPoolItem[]} items
  * @param {string} namePrefix уникальный префикс для name у radio (одна сессия страницы)
+ * @param {number} numberingStart индекс первого вопроса для нумерации (0 → «1.»)
  */
-function renderQuizBlock(container, items, namePrefix) {
-  const html = items
+function buildQuizQuestionsHtml(items, namePrefix, numberingStart) {
+  return items
     .map((q, i) => {
-      const name = `${namePrefix}-${i}`;
+      const suffix = numberingStart + i;
+      const name = `${namePrefix}-${suffix}`;
+      const displayNum = suffix + 1;
       const opts = (["a", "b", "c"]).map(
         (key) =>
           `<label class="quiz-option"><input type="radio" name="${escapeHtml(name)}" value="${key}">${escapeHtml(q.labels[key])}</label>`
       );
       return `<div class="quiz-question" data-correct="${q.correct}">
-        <p class="quiz-stem">${i + 1}. ${escapeHtml(q.stem)}</p>
+        <p class="quiz-stem">${displayNum}. ${escapeHtml(q.stem)}</p>
         <p class="translation">${escapeHtml(q.translation)}</p>
         <div class="quiz-options">${opts.join("")}</div>
         <p class="quiz-feedback" hidden></p>
       </div>`;
     })
     .join("");
-  container.innerHTML = html;
 }
 
-function fillRandomQuizBlocks() {
+function initQuizBlocks() {
   const sessionId = Math.random().toString(36).slice(2, 10);
   document.querySelectorAll(".quiz-block[data-quiz]").forEach((el) => {
     const key = el.dataset.quiz;
@@ -710,8 +772,61 @@ function fillRandomQuizBlocks() {
     if (!pool || pool.length === 0) {
       return;
     }
-    const picked = pickRandomQuizItems(pool, QUIZ_RANDOM_COUNT);
-    renderQuizBlock(el, picked, `quiz-${key}-${sessionId}`);
+    const used = new Set();
+    const namePrefix = `quiz-${key}-${sessionId}`;
+    const picked = pickUnusedQuizItems(pool, used, QUIZ_RANDOM_COUNT);
+    el.innerHTML = buildQuizQuestionsHtml(picked, namePrefix, 0);
+    quizBlockState.set(el, { pool, used, namePrefix, nextIndex: picked.length });
+    const collapse = el.closest(".quiz-collapse");
+    const moreBtn = collapse?.querySelector(`.quiz-more-btn[data-quiz-more="${key}"]`);
+    if (moreBtn instanceof HTMLButtonElement) {
+      moreBtn.disabled = used.size >= pool.length;
+    }
+  });
+}
+
+/**
+ * @param {HTMLElement} container
+ * @param {HTMLButtonElement} moreBtn
+ */
+function appendMoreQuizQuestions(container, moreBtn) {
+  const state = quizBlockState.get(container);
+  if (!state) {
+    return;
+  }
+  const { pool, used, namePrefix } = state;
+  const batch = pickUnusedQuizItems(pool, used, QUIZ_MORE_COUNT);
+  if (batch.length === 0) {
+    moreBtn.disabled = true;
+    return;
+  }
+  const prevCount = container.querySelectorAll(".quiz-question").length;
+  container.insertAdjacentHTML("beforeend", buildQuizQuestionsHtml(batch, namePrefix, state.nextIndex));
+  container.querySelectorAll(".quiz-question").forEach((node, i) => {
+    if (i >= prevCount) {
+      bindQuizQuestion(node);
+    }
+  });
+  state.nextIndex += batch.length;
+  moreBtn.disabled = used.size >= pool.length;
+}
+
+function initQuizMoreButtons() {
+  document.querySelectorAll(".quiz-more-btn[data-quiz-more]").forEach((btn) => {
+    if (!(btn instanceof HTMLButtonElement)) {
+      return;
+    }
+    btn.addEventListener("click", () => {
+      const collapse = btn.closest(".quiz-collapse");
+      const key = btn.dataset.quizMore;
+      if (!key) {
+        return;
+      }
+      const block = collapse?.querySelector(`.quiz-block[data-quiz="${key}"]`);
+      if (block instanceof HTMLElement) {
+        appendMoreQuizQuestions(block, btn);
+      }
+    });
   });
 }
 
@@ -735,11 +850,264 @@ function bindQuizQuestion(block) {
 }
 
 function initQuizzes() {
-  fillRandomQuizBlocks();
+  initQuizBlocks();
   document.querySelectorAll(".quiz-question").forEach(bindQuizQuestion);
+  initQuizMoreButtons();
+}
+
+/**
+ * @typedef {{ words: string[], translation: string }} WordOrderConfig
+ */
+
+const WORD_ORDER_POOLS = /** @type {Record<string, WordOrderConfig[]>} */ ({
+  present: [
+    { words: ["I", "am", "a", "student"], translation: "Я — студент / студентка." },
+    { words: ["She", "plays", "tennis", "on", "Sundays"], translation: "Она играет в теннис по воскресеньям." },
+    { words: ["We", "do", "not", "like", "rain"], translation: "Нам не нравится дождь." },
+    { words: ["They", "are", "at", "home", "now"], translation: "Они сейчас дома." },
+    { words: ["My", "brother", "works", "in", "a", "bank"], translation: "Мой брат работает в банке." },
+    { words: ["Does", "your", "sister", "speak", "English"], translation: "Твоя сестра говорит по-английски?" },
+    { words: ["Do", "you", "walk", "to", "school"], translation: "Ты ходишь в школу пешком?" },
+    { words: ["Are", "they", "ready", "for", "the", "test"], translation: "Они готовы к контрольной?" },
+  ],
+  past: [
+    { words: ["I", "was", "a", "student"], translation: "Я был(а) студентом / студенткой." },
+    { words: ["They", "were", "very", "tired"], translation: "Они очень устали." },
+    { words: ["She", "walked", "to", "school", "yesterday"], translation: "Вчера она пошла в школу пешком." },
+    { words: ["We", "watched", "a", "film", "last", "night"], translation: "Вчера вечером мы посмотрели фильм." },
+    { words: ["Yesterday", "I", "was", "late"], translation: "Вчера я опоздал(а)." },
+    { words: ["He", "did", "not", "answer", "my", "call"], translation: "Он не ответил на мой звонок." },
+    { words: ["Did", "you", "enjoy", "the", "concert"], translation: "Тебе понравился концерт?" },
+    { words: ["Were", "you", "at", "home", "yesterday"], translation: "Ты был(а) / Вы были дома вчера?" },
+  ],
+});
+
+/**
+ * @typedef {{ pool: WordOrderConfig[], used: Set<number>, stack: HTMLElement }} WordOrderBlockState
+ */
+
+/** @type {WeakMap<HTMLElement, WordOrderBlockState>} */
+const wordOrderBlockState = new WeakMap();
+
+/**
+ * @param {HTMLElement} bank
+ */
+function shuffleWordTokensInBank(bank) {
+  const nodes = Array.from(bank.querySelectorAll(".word-token"));
+  shuffleArray(nodes).forEach((node) => {
+    bank.appendChild(node);
+  });
+}
+
+/**
+ * @param {HTMLElement} root
+ * @param {string[]} correct
+ */
+function getFilledSequence(root) {
+  const slots = root.querySelectorAll(".word-order-slot");
+  return Array.from(slots).map((slot) => {
+    const tok = slot.querySelector(".word-token");
+    return tok ? tok.textContent.trim() : "";
+  });
+}
+
+/**
+ * @param {HTMLElement} slot
+ * @param {HTMLElement} token
+ * @param {HTMLElement} bank
+ */
+function placeTokenInSlot(slot, token, bank) {
+  const existing = slot.querySelector(".word-token");
+  if (existing && existing !== token) {
+    bank.appendChild(existing);
+  }
+  slot.appendChild(token);
+}
+
+/**
+ * @param {HTMLElement} el
+ * @param {WordOrderConfig} cfg
+ */
+function mountWordOrderExercise(el, cfg) {
+  const shuffled = shuffleArray(cfg.words.slice());
+  const slotsHtml = cfg.words
+    .map(
+      (_, i) =>
+        `<div class="word-order-slot" data-slot-index="${i}" role="listitem" aria-label="Позиция ${i + 1}"></div>`
+    )
+    .join("");
+  const tokensHtml = shuffled
+    .map((w) => `<span class="word-token" draggable="true" tabindex="0">${escapeHtml(w)}</span>`)
+    .join("");
+
+  el.innerHTML = `
+    <p class="translation word-order-translation">${escapeHtml(cfg.translation)}</p>
+    <div class="word-order-row" aria-label="Позиции в предложении">
+      <div class="word-order-slots" role="list">${slotsHtml}</div>
+    </div>
+    <p class="word-order-bank-label">Слова (перетащите на позиции выше):</p>
+    <div class="word-bank" role="group" aria-label="Банк слов">${tokensHtml}</div>
+    <div class="word-order-actions">
+      <button type="button" class="word-order-check">Проверить</button>
+      <button type="button" class="word-order-reset">Сбросить</button>
+    </div>
+    <p class="word-order-feedback quiz-feedback" hidden></p>
+  `;
+
+  const bank = el.querySelector(".word-bank");
+  const feedback = el.querySelector(".word-order-feedback");
+  if (!(bank instanceof HTMLElement)) {
+    return;
+  }
+
+  /** @type {HTMLElement | null} */
+  let dragged = null;
+
+  el.addEventListener("dragstart", (e) => {
+    const t = e.target;
+    if (!(t instanceof HTMLElement) || !t.classList.contains("word-token")) {
+      return;
+    }
+    dragged = t;
+    t.classList.add("word-token--dragging");
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", t.textContent.trim());
+  });
+
+  el.addEventListener("dragend", (e) => {
+    const t = e.target;
+    if (t instanceof HTMLElement) {
+      t.classList.remove("word-token--dragging");
+    }
+    dragged = null;
+  });
+
+  el.addEventListener("dragover", (e) => {
+    const raw = e.target;
+    const hit = raw instanceof Element ? raw.closest(".word-order-slot, .word-bank") : null;
+    if (!hit || !(hit instanceof HTMLElement) || !el.contains(hit)) {
+      return;
+    }
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  });
+
+  el.addEventListener("drop", (e) => {
+    const raw = e.target;
+    const hit = raw instanceof Element ? raw.closest(".word-order-slot, .word-bank") : null;
+    if (!hit || !(hit instanceof HTMLElement) || !el.contains(hit) || !dragged) {
+      return;
+    }
+    e.preventDefault();
+    if (hit.classList.contains("word-bank")) {
+      hit.appendChild(dragged);
+    } else if (hit.classList.contains("word-order-slot")) {
+      placeTokenInSlot(hit, dragged, bank);
+    }
+    dragged = null;
+  });
+
+  el.querySelector(".word-order-check")?.addEventListener("click", () => {
+    const seq = getFilledSequence(el);
+    const ok =
+      seq.length === cfg.words.length && seq.every((w, i) => w === cfg.words[i]);
+    el.classList.remove("word-order-ok", "word-order-bad");
+    el.classList.add(ok ? "word-order-ok" : "word-order-bad");
+    if (feedback) {
+      feedback.textContent = ok
+        ? QUIZ_OK
+        : "Пока не так — попробуйте ещё раз или нажмите «Сбросить».";
+      feedback.hidden = false;
+    }
+  });
+
+  el.querySelector(".word-order-reset")?.addEventListener("click", () => {
+    el.classList.remove("word-order-ok", "word-order-bad");
+    if (feedback) {
+      feedback.hidden = true;
+      feedback.textContent = "";
+    }
+    el.querySelectorAll(".word-order-slot .word-token").forEach((t) => {
+      if (t instanceof HTMLElement) {
+        bank.appendChild(t);
+      }
+    });
+    shuffleWordTokensInBank(bank);
+  });
+}
+
+/**
+ * @param {HTMLElement} stack
+ * @param {WordOrderConfig} cfg
+ */
+function mountWordOrderIntoStack(stack, cfg) {
+  const el = document.createElement("div");
+  el.className = "word-order-exercise";
+  stack.appendChild(el);
+  mountWordOrderExercise(el, cfg);
+}
+
+/**
+ * @param {HTMLElement} block
+ * @param {HTMLButtonElement} moreBtn
+ */
+function appendWordOrderExercise(block, moreBtn) {
+  const state = wordOrderBlockState.get(block);
+  if (!state) {
+    return;
+  }
+  const { pool, used, stack } = state;
+  const avail = pool.map((_, i) => i).filter((i) => !used.has(i));
+  if (avail.length === 0) {
+    moreBtn.disabled = true;
+    return;
+  }
+  const idx = avail[Math.floor(Math.random() * avail.length)];
+  used.add(idx);
+  mountWordOrderIntoStack(stack, pool[idx]);
+  moreBtn.disabled = used.size >= pool.length;
+}
+
+/**
+ * @param {HTMLElement} block
+ */
+function initWordOrderBlock(block) {
+  const tense = block.dataset.tense;
+  if (!tense) {
+    return;
+  }
+  const pool = WORD_ORDER_POOLS[tense];
+  if (!pool || pool.length === 0) {
+    return;
+  }
+  const stack = block.querySelector(".word-order-stack");
+  if (!(stack instanceof HTMLElement)) {
+    return;
+  }
+  const used = new Set();
+  const firstIdx = 0;
+  used.add(firstIdx);
+  mountWordOrderIntoStack(stack, pool[firstIdx]);
+  wordOrderBlockState.set(block, { pool, used, stack });
+  const moreBtn = block.querySelector(".quiz-more-btn[data-word-order-more]");
+  if (moreBtn instanceof HTMLButtonElement) {
+    moreBtn.disabled = used.size >= pool.length;
+    moreBtn.addEventListener("click", () => {
+      appendWordOrderExercise(block, moreBtn);
+    });
+  }
+}
+
+function initWordOrderExercises() {
+  document.querySelectorAll(".word-order-block[data-tense]").forEach((node) => {
+    if (node instanceof HTMLElement) {
+      initWordOrderBlock(node);
+    }
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   initInteractiveTables();
   initQuizzes();
+  initWordOrderExercises();
 });
